@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ACID Properties in DBMS — Deep Dive, Interview Questions & Cheat‑Sheet</title>
+  <meta name="description" content="A comprehensive guide to ACID properties (Atomicity, Consistency, Isolation, Durability) with deep explanations, distributed systems angle, tough interview questions, and key points to remember.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0b1020;--surface:#12172a;--card:#141a31;--text:#e8ecff;--muted:#b2b9d9;--border:#243055;--accent:#7c5cff;--accent2:#2dd4bf;--radius:18px;--shadow:0 14px 40px rgba(0,0,0,.35);--max:1100px
+    }
+    .light{--bg:#f6f7fb;--surface:#ffffff;--card:#ffffff;--text:#0b1020;--muted:#5b6280;--border:#e6e8f2;--accent:#6a5cff;--accent2:#0ea5e9;--shadow:0 10px 25px rgba(22,29,60,.08)}
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial;color:var(--text);background:
+      radial-gradient(1200px 600px at 20% -10%, rgba(124,92,255,.25), transparent 40%),
+      radial-gradient(900px 700px at 120% 10%, rgba(45,212,191,.16), transparent 45%),var(--bg)}
+    .wrap{max-width:var(--max);margin:0 auto;padding:22px}
+    .hero{display:grid;gap:16px;padding:clamp(20px,5vw,44px);background:linear-gradient(180deg,rgba(124,92,255,.12),transparent 55%),var(--surface);border:1px solid var(--border);border-radius:22px;box-shadow:var(--shadow)}
+    .badge{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);background:linear-gradient(90deg,rgba(124,92,255,.15),rgba(45,212,191,.14));border:1px dashed var(--border);border-radius:999px}
+    h1{margin:.1rem 0 .25rem;font-size:clamp(28px,4.4vw,46px);letter-spacing:-.02em;line-height:1.08}
+    .sub{margin:0;color:var(--muted);max-width:75ch;font-size:clamp(14px,2.2vw,18px)}
+    .actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px}
+    .btn{appearance:none;border:1px solid var(--border);background:var(--card);color:var(--text);padding:12px 16px;border-radius:12px;font-weight:700;display:inline-flex;align-items:center;gap:10px;text-decoration:none;cursor:pointer;transition:transform .06s ease,border-color .2s ease,background .2s ease}
+    .btn:hover{transform:translateY(-2px);border-color:var(--accent)}
+    .btn.primary{border:none;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+
+    .grid{display:grid;grid-template-columns:280px 1fr;gap:22px;margin-top:22px}
+    @media (max-width:980px){.grid{grid-template-columns:1fr}}
+
+    .toc{position:sticky;top:16px;align-self:start;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:var(--shadow)}
+    .toc h3{margin:.25rem 0 .5rem;font-size:13px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
+    .toc a{display:block;padding:10px 12px;border-radius:10px;color:var(--text);text-decoration:none;font-weight:600}
+    .toc a:hover{background:rgba(124,92,255,.12)}
+
+    section{scroll-margin-top:90px}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:clamp(18px,3.2vw,28px);box-shadow:var(--shadow);margin-bottom:20px}
+    .head{display:flex;gap:12px;align-items:center;margin-bottom:8px}
+    .chip{font-size:12px;color:var(--muted);border:1px solid var(--border);border-radius:999px;padding:6px 10px}
+
+    .list{display:grid;gap:10px;margin-top:10px}
+    .item{display:grid;grid-template-columns:26px 1fr;gap:10px;align-items:flex-start}
+    .dot{width:12px;height:12px;margin-top:7px;border-radius:3px;background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 4px 10px rgba(124,92,255,.3);transform:rotate(45deg)}
+
+    .note{background:linear-gradient(180deg,rgba(45,212,191,.12),transparent 60%),var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;color:var(--muted);font-size:14px}
+
+    details.acc{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+    details[open].acc{box-shadow:inset 0 0 0 1px rgba(124,92,255,.25)}
+    details summary{cursor:pointer;font-weight:800}
+    details summary::-webkit-details-marker{display:none}
+
+    pre,code{font-family:"Fira Code",ui-monospace,Menlo,Consolas,monospace}
+    .kbd{font:600 12px "Fira Code";background:var(--card);border:1px solid var(--border);padding:2px 6px;border-radius:6px}
+
+    .faq{counter-reset:q}
+    .faq dt{counter-increment:q;font-weight:800}
+    .faq dt::before{content:counter(q) ". ";opacity:.7;margin-right:4px}
+    .faq dd{margin:0 0 14px 0;color:var(--muted)}
+
+    .footer{text-align:center;color:var(--muted);padding:36px 12px;font-size:14px}
+
+    /* Callouts */
+    .callout{border:1px solid var(--border);border-left:6px solid var(--accent);padding:14px;border-radius:12px;background:var(--card)}
+
+    /* Print */
+    @media print{body{background:#fff}.hero,.toc,.actions{box-shadow:none}.grid{grid-template-columns:1fr}.wrap{max-width:900px}}
+  </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "ACID Properties in DBMS — Deep Dive, Interview Questions & Cheat‑Sheet",
+    "description": "Deep explanation of Atomicity, Consistency, Isolation, Durability with distributed systems angle, examples, FAQs, and interview prep.",
+    "author": {"@type": "Person", "name": "Customer Care Info Editorial Team"},
+    "inLanguage": "en",
+    "mainEntityOfPage": {"@type": "WebPage", "@id": ""},
+    "about": ["ACID", "DBMS", "Transactions", "RDBMS"],
+    "keywords": "ACID properties, DBMS, transaction management, atomicity, consistency, isolation, durability"
+  }
+  </script>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <div>
+        <span class="badge">DBMS • Transactions • Interview Prep</span>
+        <h1>ACID Properties in DBMS — Deep Dive</h1>
+        <p class="sub">Everything you need to master <strong>Atomicity, Consistency, Isolation, Durability</strong> — from inner workings (WAL, MVCC, 2PC) to distributed systems trade‑offs, plus tough interview questions and a crisp cheat‑sheet.</p>
+        <div class="actions">
+          <a class="btn primary" href="#toc">Browse Sections</a>
+          <button class="btn" id="themeBtn" aria-label="Toggle theme">Toggle Theme</button>
+          <a class="btn" href="#questions">Interview Q&amp;A</a>
+        </div>
+      </div>
+    </header>
+
+    <div class="grid">
+      <nav class="toc" id="toc" aria-label="Table of contents">
+        <h3>Contents</h3>
+        <a href="#transaction">What is a Transaction?</a>
+        <a href="#atomicity">Atomicity</a>
+        <a href="#consistency">Consistency</a>
+        <a href="#isolation">Isolation</a>
+        <a href="#durability">Durability</a>
+        <a href="#distributed">ACID in Distributed Systems</a>
+        <a href="#misconceptions">Common Misconceptions</a>
+        <a href="#questions">Tough Interview Questions</a>
+        <a href="#cheatsheet">Points to Remember</a>
+        <hr style="border:none;border-top:1px solid var(--border);margin:10px 0">
+        <a href="#top">Back to top ↑</a>
+      </nav>
+
+      <main>
+        <section id="transaction" class="card">
+          <div class="head"><h2>What is a Transaction?</h2><span class="chip">Unit of Work</span></div>
+          <p>A <strong>transaction</strong> is a logical, atomic unit of work composed of one or more operations (e.g., multiple SQL statements) that must be executed as a whole. If any step fails, the system must appear as if none of the steps occurred.</p>
+          <div class="note">Example: Funds transfer — debit ₹10,000 from Account A and credit Account B. Either both succeed or both fail.</div>
+        </section>
+
+        <section id="atomicity" class="card">
+          <div class="head"><h2>Atomicity</h2><span class="chip">All‑or‑Nothing</span></div>
+          <p><strong>Atomicity</strong> guarantees that a transaction’s operations are indivisible: either <em>all</em> changes are committed or <em>none</em> are. On failure, the system rolls back partial effects.</p>
+          <div class="list">
+            <div class="item"><span class="dot"></span><div><strong>How it works:</strong> <em>Write‑Ahead Logging (WAL)</em> ensures log records are flushed to stable storage <em>before</em> corresponding data pages. On crash, <em>undo</em> is driven by the log to revert incomplete operations.</div></div>
+            <div class="item"><span class="dot"></span><div><strong>Undo/Redo:</strong> Databases maintain <em>undo</em> (rollback segments) and <em>redo</em> records. Undo backs out uncommitted changes; redo reapplies committed ones after restart.</div></div>
+            <div class="item"><span class="dot"></span><div><strong>Distributed Atomicity:</strong> <em>Two‑Phase Commit (2PC)</em> coordinates multiple resource managers. Phase‑1: prepare/vote; Phase‑2: commit/abort. 3PC adds a pre‑commit to reduce blocking, but increases complexity.</div></div>
+          </div>
+          <div class="callout"><strong>Trade‑off:</strong> Strong atomicity with synchronous logging can increase latency. Techniques like group commit batch log flushes to amortize cost.</div>
+        </section>
+
+        <section id="consistency" class="card">
+          <div class="head"><h2>Consistency</h2><span class="chip">Valid State → Valid State</span></div>
+          <p><strong>Consistency</strong> ensures every committed transaction preserves database invariants defined by constraints, triggers, and application rules. It does <em>not</em> guarantee real‑world truth — only that the state conforms to declared rules.</p>
+          <div class="list">
+            <div class="item"><span class="dot"></span><div><strong>Enforcement:</strong> primary/unique keys, foreign keys, <code>CHECK</code> constraints, generated columns, and triggers. Violations cause the transaction to abort.</div></div>
+            <div class="item"><span class="dot"></span><div><strong>Application Logic:</strong> Some invariants live outside the schema (e.g., business rules). Consistency then relies on validations within the transaction boundary.</div></div>
+            <div class="item"><span class="dot"></span><div><strong>Isolation Dependency:</strong> Consistency depends on proper isolation; without it, concurrent anomalies can produce invalid end states.</div></div>
+          </div>
+          <div class="note"><strong>ACID vs CAP Consistency:</strong> ACID’s consistency is about rule preservation inside a DB. CAP’s consistency is about a distributed system presenting a single, linearizable view.</div>
+        </section>
+
+        <section id="isolation" class="card">
+          <div class="head"><h2>Isolation</h2><span class="chip">Concurrency Control</span></div>
+          <p><strong>Isolation</strong> keeps concurrently executing transactions from seeing each other’s intermediate states. It’s quantified via SQL isolation levels, each preventing certain anomalies.</p>
+          <div class="list">
+            <div class="item"><span class="dot"></span><div><strong>Anomalies:</strong> dirty reads, non‑repeatable reads, phantom reads, lost updates, write skew.</div></div>
+            <div class="item"><span class="dot"></span><div><strong>Isolation Levels:</strong> Read Uncommitted → Read Committed → Repeatable Read → Serializable (strongest). Some systems also expose Snapshot Isolation.</div></div>
+            <div class="item"><span class="dot"></span><div><strong>Mechanisms:</strong> <em>Locking</em> (S/X, intent locks, lock escalation), <em>MVCC</em> (multi‑version snapshots, commit timestamps), and <em>timestamp ordering</em>. Serializable may be implemented via strict 2PL or Serializable Snapshot Isolation (SSI).</div></div>
+            <div class="item"><span class="dot"></span><div><strong>Performance:</strong> Stronger isolation reduces concurrency due to blocking or aborts; MVCC improves read concurrency by serving historical snapshots.</div></div>
+          </div>
+          <details class="acc"><summary>Example: Preventing Lost Updates</summary>
+            <p>Use <code>SELECT ... FOR UPDATE</code> (locking) or compare‑and‑swap version columns (optimistic) so concurrent writers don’t overwrite each other.</p>
+          </details>
+        </section>
+
+        <section id="durability" class="card">
+          <div class="head"><h2>Durability</h2><span class="chip">Survives Crashes</span></div>
+          <p><strong>Durability</strong> makes a committed transaction’s effects permanent. After a crash, recovery replays committed changes (redo) and rolls back incomplete ones (undo).</p>
+          <div class="list">
+            <div class="item"><span class="dot"></span><div><strong>WAL & Checkpoints:</strong> Logs persist to stable storage; periodic checkpoints limit recovery time by flushing dirty pages and recording a consistent point.</div></div>
+            <div class="item"><span class="dot"></span><div><strong>FSync & Group Commit:</strong> Durability often hinges on <code>fsync</code>. Group commit batches multiple transactions into one flush to reduce I/O cost.</div></div>
+            <div class="item"><span class="dot"></span><div><strong>Replication:</strong> Synchronous replication (quorum/majority) can extend durability to node failures; asynchronous replication risks recent loss on primary crashover.</div></div>
+          </div>
+        </section>
+
+        <section id="distributed" class="card">
+          <div class="head"><h2>ACID in Distributed Systems</h2><span class="chip">Networks, CAP & Consensus</span></div>
+          <p>Distribution introduces partial failures, latency, and partitions. Maintaining ACID now involves coordination and consensus.</p>
+          <div class="list">
+            <div class="item"><span class="dot"></span><div><strong>Atomicity:</strong> 2PC/3PC across shards or services; participants keep prepared state until the coordinator decides.</div></div>
+            <div class="item"><span class="dot"></span><div><strong>Consistency:</strong> Global invariants might require cross‑shard constraints; many systems limit such constraints for scalability.</div></div>
+            <div class="item"><span class="dot"></span><div><strong>Isolation:</strong> Global ordering via <em>TrueTime</em>/hybrid clocks, or per‑key sequencing. Serializable Snapshot Isolation plus conflict detection is common.</div></div>
+            <div class="item"><span class="dot"></span><div><strong>Durability:</strong> Replicated logs (Paxos/Raft) and quorum writes; fast failover with careful fencing to avoid split‑brain.</div></div>
+          </div>
+          <div class="callout"><strong>Rule of Thumb:</strong> If cross‑service transactions are rare, prefer <em>sagas</em> + idempotency over global 2PC to avoid coordinator bottlenecks.</div>
+        </section>
+
+        <section id="misconceptions" class="card">
+          <div class="head"><h2>Common Misconceptions</h2><span class="chip">Clarity</span></div>
+          <ul class="list" role="list">
+            <li class="item"><span class="dot"></span><div><strong>ACID Consistency ≠ CAP Consistency:</strong> ACID talks about invariant preservation; CAP’s consistency is linearizability across replicas.</div></li>
+            <li class="item"><span class="dot"></span><div><strong>Durability is not Backup:</strong> Backups/snapshots protect against corruption or deletion; durability protects against crash‑loss of committed data.</div></li>
+            <li class="item"><span class="dot"></span><div><strong>Isolation isn’t “lock everything”:</strong> Over‑locking kills throughput; MVCC or optimistic control keeps concurrency high.</div></li>
+          </ul>
+        </section>
+
+        <section id="questions" class="card">
+          <div class="head"><h2>Tough Interview Questions</h2><span class="chip">Concepts • Scenarios</span></div>
+          <dl class="faq">
+            <dt>Explain how Write‑Ahead Logging delivers both atomicity and durability. What happens during crash recovery?</dt>
+            <dd>Discuss log sequence numbers, force‑log‑before‑data rule, checkpointing, analysis/redo/undo phases.</dd>
+
+            <dt>Differentiate ACID’s Consistency from CAP’s Consistency with an example.</dt>
+            <dd>Use a foreign‑key example for ACID and linearizable reads/writes across replicas for CAP.</dd>
+
+            <dt>How does MVCC provide snapshot reads? What anomalies can still occur under Snapshot Isolation?</dt>
+            <dd>Explain commit timestamps, visibility rules, and <em>write skew</em> anomaly without predicate locks.</dd>
+
+            <dt>Why is Serializable often expensive? Compare strict 2PL vs Serializable Snapshot Isolation (SSI).</dt>
+            <dd>Cover blocking, deadlocks vs abort‑on‑conflict using RW dependency graphs.</dd>
+
+            <dt>Walk through 2PC. Where can it block? How do systems mitigate coordinator failure?</dt>
+            <dd>Prepared state, logs, coordinator election, timeouts, presumed abort/commit, or avoiding 2PC via sagas.</dd>
+
+            <dt>Design a wallet transfer service supporting idempotency and exactly‑once <em>effects</em>.</dt>
+            <dd>Outbox/inbox tables, dedupe keys, retry with backoff, idempotent credit/debit operations.</dd>
+
+            <dt>Which isolation level for high‑frequency trading order book and why?</dt>
+            <dd>Argue for Serializable or SI+predicate locks to avoid write skew/lost updates; discuss latency trade‑offs.</dd>
+
+            <dt>What are phantom reads and how do you prevent them?</dt>
+            <dd>Range/predicate locks or SSI with conflict detection on predicate reads.</dd>
+          </dl>
+        </section>
+
+        <section id="cheatsheet" class="card">
+          <div class="head"><h2>Points to Remember (Cheat‑Sheet)</h2><span class="chip">Quick Recall</span></div>
+          <ul class="list" role="list">
+            <li class="item"><span class="dot"></span><div><strong>Atomicity</strong>: all‑or‑nothing via WAL + undo.</div></li>
+            <li class="item"><span class="dot"></span><div><strong>Consistency</strong>: schema/business invariants preserved; isolation helps maintain it.</div></li>
+            <li class="item"><span class="dot"></span><div><strong>Isolation</strong>: levels trade anomalies for performance; MVCC boosts reads.</div></li>
+            <li class="item"><span class="dot"></span><div><strong>Durability</strong>: commit survives crashes via redo, checkpoints, replication.</div></li>
+            <li class="item"><span class="dot"></span><div><strong>Distributed</strong>: 2PC/consensus; consider sagas for scalability.</div></li>
+            <li class="item"><span class="dot"></span><div><strong>ACID≠CAP</strong>: different notions of consistency.</div></li>
+            <li class="item"><span class="dot"></span><div><strong>Perf</strong>: group commit, batching, careful locking; measure with p99 latency.</div></li>
+          </ul>
+        </section>
+
+        <footer class="footer">Built with ♥ for clarity and speed. Toggle theme for a print‑friendly light mode.</footer>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const root=document.body;const btn=document.getElementById('themeBtn');const KEY='acid-theme-light';
+    const apply=()=>{if(localStorage.getItem(KEY)==='1')root.classList.add('light');else root.classList.remove('light')};
+    apply();
+    btn.addEventListener('click',()=>{const cur=localStorage.getItem(KEY)==='1';localStorage.setItem(KEY,cur?'0':'1');apply()});
+  </script>
+</body>
+</html>

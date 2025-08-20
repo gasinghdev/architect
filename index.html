@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="A beautifully designed single-page guide covering Java Architect interview topics with a sticky table of contents." />
+  <title>Java Architect Interview Prep</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ja-bg: #0b1020;
+      --ja-surface: #12172a;
+      --ja-card: #141a31;
+      --ja-text: #e8ecff;
+      --ja-muted: #b2b9d9;
+      --ja-accent: #7c5cff;
+      --ja-accent-2: #2dd4bf;
+      --ja-border: #253053;
+      --ja-shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius-xl: 18px;
+      --radius-lg: 14px;
+      --radius-md: 12px;
+      --radius-sm: 10px;
+      --pad-xl: 28px;
+      --pad-lg: 22px;
+      --pad-md: 16px;
+      --pad-sm: 12px;
+      --maxw: 1100px;
+    }
+
+    /* Light theme */
+    .light {
+      --ja-bg: #f6f7fb;
+      --ja-surface: #ffffff;
+      --ja-card: #ffffff;
+      --ja-text: #0b1020;
+      --ja-muted: #565d7a;
+      --ja-accent: #6a5cff;
+      --ja-accent-2: #0ea5e9;
+      --ja-border: #e6e8f2;
+      --ja-shadow: 0 10px 25px rgba(22, 29, 60, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      color: var(--ja-text);
+      background: radial-gradient(1200px 600px at 20% -10%, rgba(124,92,255,.25), transparent 40%),
+                  radial-gradient(900px 700px at 120% 10%, rgba(45,212,191,.16), transparent 45%),
+                  var(--ja-bg);
+    }
+
+    .ja-wrap { max-width: var(--maxw); margin: 0 auto; padding: 24px; }
+
+    .ja-hero {
+      display: grid; grid-template-columns: 1fr; gap: 20px; align-items: center;
+      padding: clamp(24px, 5vw, 48px);
+      background: linear-gradient(180deg, rgba(124,92,255,.12), rgba(124,92,255,0) 50%), var(--ja-surface);
+      border: 1px solid var(--ja-border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--ja-shadow);
+      position: relative; overflow: hidden;
+    }
+
+    .ja-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-weight: 600; font-size: 12px; letter-spacing: .6px; text-transform: uppercase;
+      color: var(--ja-accent);
+      background: linear-gradient(90deg, rgba(124,92,255,.15), rgba(45,212,191,.12));
+      padding: 8px 12px; border-radius: 999px;
+      border: 1px dashed var(--ja-border);
+    }
+
+    h1 {
+      font-size: clamp(28px, 4.2vw, 44px);
+      line-height: 1.1; margin: 10px 0 12px; letter-spacing: -0.02em;
+    }
+
+    .ja-sub {
+      font-size: clamp(14px, 2.2vw, 18px); color: var(--ja-muted);
+      max-width: 75ch; margin: 0;
+    }
+
+    .ja-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 18px; }
+    .ja-btn {
+      appearance: none; border: 1px solid var(--ja-border); background: var(--ja-card);
+      color: var(--ja-text); padding: 12px 16px; border-radius: 12px; font-weight: 600;
+      display: inline-flex; align-items: center; gap: 10px; cursor: pointer;
+      transition: transform .06s ease, background .2s ease, border-color .2s ease; text-decoration: none;
+    }
+    .ja-btn:hover { transform: translateY(-2px); border-color: var(--ja-accent); }
+    .ja-btn.primary { background: linear-gradient(135deg, var(--ja-accent), var(--ja-accent-2)); color: white; border: none; }
+
+    .ja-grid { display: grid; grid-template-columns: 280px 1fr; gap: 22px; margin-top: 26px; }
+    @media (max-width: 980px){ .ja-grid { grid-template-columns: 1fr; } }
+
+    /* Sticky TOC */
+    .ja-toc {
+      position: sticky; top: 18px; align-self: start;
+      background: var(--ja-surface); border: 1px solid var(--ja-border);
+      border-radius: var(--radius-lg); padding: var(--pad-lg);
+      box-shadow: var(--ja-shadow);
+    }
+    .ja-toc h3 { margin: 0 0 6px; font-size: 14px; text-transform: uppercase; letter-spacing: .08em; color: var(--ja-muted); }
+    .ja-toc a { display: block; padding: 10px 12px; text-decoration: none; color: var(--ja-text); border-radius: 10px; font-weight: 500; }
+    .ja-toc a:hover { background: rgba(124,92,255,.12); }
+
+    /* Section Cards */
+    section { scroll-margin-top: 90px; }
+    .ja-card {
+      background: var(--ja-surface); border: 1px solid var(--ja-border);
+      border-radius: var(--radius-lg); padding: var(--pad-xl); margin-bottom: 20px;
+      box-shadow: var(--ja-shadow);
+    }
+
+    .ja-sec-head { display: flex; gap: 14px; align-items: center; margin-bottom: 8px; }
+    .ja-sec-head h2 { margin: 0; font-size: clamp(20px, 3.5vw, 28px); }
+    .ja-chip { font-size: 12px; color: var(--ja-muted); border: 1px solid var(--ja-border); border-radius: 999px; padding: 6px 10px; }
+
+    .ja-list { display: grid; gap: 10px; margin: 12px 0 0; }
+    .ja-item { display: grid; grid-template-columns: 28px 1fr; gap: 10px; align-items: start; }
+
+    /* Pretty bullets */
+    .ja-dot {
+      width: 12px; height: 12px; margin-top: 7px; border-radius: 3px;
+      background: linear-gradient(135deg, var(--ja-accent), var(--ja-accent-2)); box-shadow: 0 4px 10px rgba(124,92,255,.3);
+      transform: rotate(45deg);
+    }
+
+    .ja-note {
+      background: linear-gradient(180deg, rgba(45,212,191,.12), transparent 60%), var(--ja-card);
+      border: 1px solid var(--ja-border);
+      border-radius: var(--radius-md);
+      padding: var(--pad-lg);
+      font-size: 14px; color: var(--ja-muted);
+    }
+
+    /* Accordion for practice prompts */
+    details.ja-acc { background: var(--ja-card); border: 1px solid var(--ja-border); border-radius: var(--radius-md); padding: 14px 16px; }
+    details[open].ja-acc { box-shadow: inset 0 0 0 1px rgba(124,92,255,.25); }
+    details summary { cursor: pointer; font-weight: 700; }
+    details summary::-webkit-details-marker { display:none; }
+
+    /* Footer */
+    .ja-footer { text-align: center; color: var(--ja-muted); padding: 36px 12px; font-size: 14px; }
+
+    /* Code style */
+    code, pre { font-family: "Fira Code", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
+    .kbd { font: 500 12px "Fira Code"; background: var(--ja-card); border: 1px solid var(--ja-border); padding: 3px 6px; border-radius: 6px; }
+
+    /* Print */
+    @media print {
+      body { background: #fff; }
+      .ja-hero, .ja-toc, .ja-actions { box-shadow: none; }
+      .ja-grid { grid-template-columns: 1fr; }
+      .ja-wrap { max-width: 900px; }
+    }
+  </style>
+</head>
+<body class="" id="top">
+  <div class="ja-wrap">
+    <header class="ja-hero">
+      <div>
+        <span class="ja-badge">Java Architect · Interview Prep</span>
+        <h1>Master the Essentials for Your Java Architect Interview</h1>
+        <p class="ja-sub">A curated, high‑impact checklist across Core Java, Spring, Microservices, System Design, Cloud, DevOps, Security, and more. Includes practice prompts to sharpen your narrative and trade‑off thinking.</p>
+        <div class="ja-actions">
+          <a href="#toc" class="ja-btn primary">Browse Topics</a>
+          <button class="ja-btn" id="themeBtn" aria-label="Toggle theme">Toggle Theme</button>
+          <a href="#practice" class="ja-btn">Practice Questions</a>
+        </div>
+      </div>
+    </header>
+
+    <div class="ja-grid">
+      <nav class="ja-toc" id="toc" aria-label="Table of contents">
+        <h3>Contents</h3>
+        <a href="#core">Core & Advanced Java</a>
+        <a href="#frameworks">Frameworks & Middleware</a>
+        <a href="#microservices">Microservices Architecture</a>
+        <a href="#cloud">Cloud & Deployment</a>
+        <a href="#databases">Databases & Storage</a>
+        <a href="#system-design">System Design & Architecture</a>
+        <a href="#devops">DevOps & Observability</a>
+        <a href="#best">Best Practices</a>
+        <a href="#practice">Practice Prompts</a>
+        <hr style="border:none;border-top:1px solid var(--ja-border);margin:10px 0;">
+        <a href="#top">Back to top ↑</a>
+      </nav>
+
+      <main>
+        <!-- Core Java -->
+        <section id="core" class="ja-card">
+          <div class="ja-sec-head">
+            <h2>1) Core & Advanced Java</h2>
+            <span class="ja-chip">JVM • GC • Concurrency</span>
+          </div>
+          <div class="ja-note">Be ready to explain not just <em>what</em> you use, but <em>why</em>: design choices, trade‑offs, and performance impact.</div>
+          <div class="ja-list" role="list">
+            <div class="ja-item" role="listitem"><span class="ja-dot"></span><div><strong>Java Fundamentals</strong>: OOP, Collections, Generics, Streams, Lambdas, Functional Interfaces.</div></div>
+            <div class="ja-item" role="listitem"><span class="ja-dot"></span><div><strong>Memory & GC</strong>: heap vs stack, escape analysis, GC types (G1/ZGC), tuning flags, profiling.</div></div>
+            <div class="ja-item" role="listitem"><span class="ja-dot"></span><div><strong>Concurrency</strong>: threads, locks, CAS, Executors, CompletableFuture, Fork/Join, deadlock/ livelock.</div></div>
+            <div class="ja-item" role="listitem"><span class="ja-dot"></span><div><strong>JVM Internals</strong>: class loading, JIT/HotSpot, bytecode, startup vs throughput trade‑offs.</div></div>
+            <div class="ja-item" role="listitem"><span class="ja-dot"></span><div><strong>Modern Java</strong>: Streams best practices, Optionals, Records, Sealed classes, Virtual Threads (Loom).</div></div>
+          </div>
+        </section>
+
+        <!-- Frameworks -->
+        <section id="frameworks" class="ja-card">
+          <div class="ja-sec-head">
+            <h2>2) Frameworks & Middleware</h2>
+            <span class="ja-chip">Spring • JPA • Messaging</span>
+          </div>
+          <div class="ja-list">
+            <div class="ja-item"><span class="ja-dot"></span><div><strong>Spring Core</strong>: IoC, AOP, events, bean scopes, configuration properties, validation.</div></div>
+            <div class="ja-item"><span class="ja-dot"></span><div><strong>Spring Boot</strong>: auto‑configuration, profiles, Actuator, configuration layering, graceful shutdown.</div></div>
+            <div class="ja-item"><span class="ja-dot"></span><div><strong>Spring Data JPA/Hibernate</strong>: entity mapping, caching, N+1, lazy vs eager, batch writes, 2nd‑level cache.</div></div>
+            <div class="ja-item"><span class="ja-dot"></span><div><strong>Spring Cloud</strong>: config server, discovery, API gateway, circuit breaker, Sleuth/Zipkin.</div></div>
+            <div class="ja-item"><span class="ja-dot"></span><div><strong>Messaging</strong>: Kafka/RabbitMQ/JMS fundamentals; exactly‑once semantics myth vs reality, idempotency.</div></div>
+          </div>
+        </section>
+
+        <!-- Microservices -->
+        <section id="microservices" class="ja-card">
+          <div class="ja-sec-head">
+            <h2>3) Microservices Architecture</h2>
+            <span class="ja-chip">Patterns • Resilience • Consistency</span>
+          </div>
+          <div class="ja-list">
+            <div class="ja-item"><span class="ja-dot"></span><div><strong>Design Patterns</strong>: Saga, CQRS, Event Sourcing, Strangler Fig, BFF, Sidecar.</div></div>
+            <div class="ja-item"><span class="ja-dot"></span><div><strong>API Design</strong>: REST maturity, pagination, versioning, GraphQL basics, gRPC for internal comms.</div></div>
+            <div class="ja-item"><span class="ja-dot"></span><div><strong>Resilience</strong>: retry, circuit breaker, bulkhead, timeout budgets, rate limiting, backpressure.</div></div>
+            <div class="ja-item"><span class="ja-dot"></span><div><strong>Service Mesh</strong>: Istio/Linkerd basics, mutual TLS, traffic shaping, observability.</div></div>
+            <div class="ja-item"><span class="ja-dot"></span><div><strong>Distributed Transactions</strong>: 2PC pitfalls, Outbox pattern, inbox/ dedupe, eventual consistency.</div></div>
+          </div>
+        </section>
+
+        <!-- Cloud -->
+        <section id="cloud" class="ja-card">
+          <div class="ja-sec-head">
+            <h2>4) Cloud & Deployment</h2>
+            <span class="ja-chip">Kubernetes • CI/CD • Serverless</span>
+          </div>
+          <div class="ja-list">
+            <div class="ja-item"><span class="ja-dot"></span><div><strong>Cloud Platforms</strong>: AWS/Azure/GCP foundations—identity, networking, storage, compute, costing.</div></div>
+            <div class="ja-item"><span class="ja-dot"></span><div><strong>Containers & Orchestration</strong>: Docker images, security, K8s workloads, services/ingress, Helm.</div></div>
+            <div class="ja-item"><span class="ja-dot"></span><div><strong>CI/CD</strong>: pipelines, artifact management, blue/green & canary, GitOps (ArgoCD/Flux).</div></div>
+            <div class="ja-item"><span class="ja-dot"></span><div><strong>Serverless</strong>: Lambda/Functions fundamentals, cold starts, when to use vs containers.</div></div>
+          </div>
+        </section>
+
+        <!-- Databases -->
+        <section id="databases" class="ja-card">
+          <div class="ja-sec-head">
+            <h2>5) Databases & Storage</h2>
+            <span class="ja-chip">SQL • NoSQL • Caching</span>
+          </div>
+          <div class="ja-list">
+            <div class="ja-item"><span class="ja-dot"></span><div><strong>Relational</strong>: indexing, query plans, transactions, isolation, deadlocks, partitioning.</div></div>
+            <div class="ja-item"><span class="ja-dot"></span><div><strong>NoSQL</strong>: document (MongoDB), wide‑column (Cassandra), key‑value (Redis), consistency models.</div></div>
+            <div class="ja-item"><span class="ja-dot"></span><div><strong>Caching</strong>: local vs distributed, TTL/refresh‑ahead, cache stampede, write‑through/behind.</div></div>
+            <div class="ja-item"><span class="ja-dot"></span><div><strong>Data Modeling</strong>: normalization vs denormalization, sharding strategies, data retention.</div></div>
+          </div>
+        </section>
+
+        <!-- System Design -->
+        <section id="system-design" class="ja-card">
+          <div class="ja-sec-head">
+            <h2>6) System Design & Architecture</h2>
+            <span class="ja-chip">Scale • Patterns • Security</span>
+          </div>
+          <div class="ja-list">
+            <div class="ja-item"><span class="ja-dot"></span><div><strong>Scalability</strong>: horizontal vs vertical, load balancing, autoscaling, CAP & PACELC, backpressure.</div></div>
+            <div class="ja-item"><span class="ja-dot"></span><div><strong>Design Patterns</strong>: Factory, Singleton, Builder, Observer, Proxy, Adapter, Strategy.</div></div>
+            <div class="ja-item"><span class="ja-dot"></span><div><strong>Enterprise Integration</strong>: EDA, message brokers, choreography vs orchestration, idempotency.</div></div>
+            <div class="ja-item"><span class="ja-dot"></span><div><strong>Edge & Gateways</strong>: API Gateway vs Reverse Proxy, rate limiting, authn/z, WAF basics.</div></div>
+            <div class="ja-item"><span class="ja-dot"></span><div><strong>Security</strong>: OAuth2/OIDC, JWT, SAML, TLS/SSL, CSRF/XSS/SQLi mitigations, secrets mgmt.</div></div>
+          </div>
+        </section>
+
+        <!-- DevOps -->
+        <section id="devops" class="ja-card">
+          <div class="ja-sec-head">
+            <h2>7) DevOps & Observability</h2>
+            <span class="ja-chip">Metrics • Traces • SLOs</span>
+          </div>
+          <div class="ja-list">
+            <div class="ja-item"><span class="ja-dot"></span><div><strong>Monitoring & Logging</strong>: Prometheus, Grafana, ELK/Splunk; log correlation, structured logging.</div></div>
+            <div class="ja-item"><span class="ja-dot"></span><div><strong>Tracing</strong>: OpenTelemetry, Jaeger/Zipkin; spans, sampling, trace‑based alerting.</div></div>
+            <div class="ja-item"><span class="ja-dot"></span><div><strong>Health & Metrics</strong>: Actuator/Micrometer, RED/USE metrics, SLI/SLO/SLA, error budgets.</div></div>
+            <div class="ja-item"><span class="ja-dot"></span><div><strong>Testing</strong>: unit/integration/contract/E2E; performance with JMeter/Gatling; chaos testing.</div></div>
+          </div>
+        </section>
+
+        <!-- Best Practices -->
+        <section id="best" class="ja-card">
+          <div class="ja-sec-head">
+            <h2>8) Best Practices</h2>
+            <span class="ja-chip">Quality • Maintainability</span>
+          </div>
+          <div class="ja-list">
+            <div class="ja-item"><span class="ja-dot"></span><div><strong>Clean Code & SOLID</strong>: layering, ports & adapters, domain‑driven design lite, readability.</div></div>
+            <div class="ja-item"><span class="ja-dot"></span><div><strong>12‑Factor Apps</strong>: config, logs, disposability, statelessness, admin processes.</div></div>
+            <div class="ja-item"><span class="ja-dot"></span><div><strong>Backward Compatibility</strong>: API versioning, schema migration, dark launches, feature flags.</div></div>
+            <div class="ja-item"><span class="ja-dot"></span><div><strong>Documentation</strong>: ADRs, architecture diagrams (C4), runbooks, on‑call handoffs.</div></div>
+          </div>
+        </section>
+
+        <!-- Practice Prompts -->
+        <section id="practice" class="ja-card">
+          <div class="ja-sec-head">
+            <h2>Practice Prompts</h2>
+            <span class="ja-chip">Storytelling • Trade‑offs</span>
+          </div>
+
+          <details class="ja-acc" open>
+            <summary>High Availability Payment System (15–20 min)</summary>
+            <ol>
+              <li>Requirements: 99.99% availability, PCI concerns, burst traffic (5× on sale days), multi‑region read/write.</li>
+              <li>Sketch: API Gateway → Auth → Orchestrator → Payment Providers (idempotent), Outbox, Sagas for refund.</li>
+              <li>Deep dive: data consistency, failure modes, retries/backoff, monitoring, canary, rollback plan.</li>
+            </ol>
+          </details>
+
+          <details class="ja-acc">
+            <summary>Data Consistency in Microservices</summary>
+            <p>Compare 2PC vs Saga. Explain Outbox pattern, dedupe keys, exactly‑once <em>effect</em> vs delivery, and recovery strategies.</p>
+          </details>
+
+          <details class="ja-acc">
+            <summary>Scale to Millions of RPS</summary>
+            <p>Discuss caching layers, async processing, connection pooling, reactive vs blocking, backpressure, rate limiting, autoscaling, cost.</p>
+          </details>
+
+          <details class="ja-acc">
+            <summary>Security Deep Dive</summary>
+            <p>Contrast OAuth2/OIDC vs SAML; JWT pitfalls (size/rotation/blacklist); zero‑trust, secrets rotation, SBOM & supply‑chain risks.</p>
+          </details>
+
+          <details class="ja-acc">
+            <summary>Observability Story</summary>
+            <p>Tell a war story: how metrics + traces revealed a performance regression, and how you fixed it with <span class="kbd">RED</span>/<span class="kbd">USE</span> dashboards.</p>
+          </details>
+        </section>
+
+        <section class="ja-card">
+          <div class="ja-sec-head">
+            <h2>Pro Tips</h2>
+            <span class="ja-chip">Interview Ready</span>
+          </div>
+          <ul>
+            <li>Frame answers as: <strong>Context → Options → Trade‑offs → Decision → Impact</strong>.</li>
+            <li>Use <strong>numbers</strong> (latency, throughput, cost) and <strong>failure modes</strong> to show depth.</li>
+            <li>Bring a consistent reference design (C4 level 1–3) you can adapt for different prompts.</li>
+          </ul>
+        </section>
+
+        <footer class="ja-footer">
+          Built with ♥ for focused interview prep. Toggle theme for print‑friendly mode.
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    // Theme toggle with localStorage
+    const root = document.body;
+    const btn = document.getElementById('themeBtn');
+    const LS_KEY = 'ja-theme-light';
+    const apply = () => {
+      if(localStorage.getItem(LS_KEY) === '1') root.classList.add('light');
+      else root.classList.remove('light');
+    };
+    apply();
+    btn.addEventListener('click', () => {
+      const cur = localStorage.getItem(LS_KEY) === '1';
+      localStorage.setItem(LS_KEY, cur ? '0' : '1');
+      apply();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blank Identifier in Go</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      color: #333;
+      display: flex;
+    }
+    .sidebar {
+      width: 220px;
+      background: #2c3e50;
+      color: #fff;
+      height: 100vh;
+      position: fixed;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .sidebar h2 {
+      font-size: 18px;
+      margin-bottom: 15px;
+    }
+    .sidebar a {
+      display: block;
+      color: #ecf0f1;
+      text-decoration: none;
+      margin: 8px 0;
+      font-size: 15px;
+    }
+    .sidebar a:hover {
+      text-decoration: underline;
+    }
+    .content {
+      margin-left: 240px;
+      padding: 30px;
+      max-width: 800px;
+    }
+    h1, h2 {
+      color: #2c3e50;
+    }
+    .card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      margin: 20px 0;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    pre {
+      background: #272822;
+      color: #f8f8f2;
+      padding: 12px;
+      border-radius: 6px;
+      overflow-x: auto;
+    }
+    code {
+      font-family: Consolas, monospace;
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <h2>Go Basics</h2>
+    <a href="#intro">Introduction</a>
+    <a href="#ignoring-returns">Ignoring Return Values</a>
+    <a href="#loops">Ignoring in Loops</a>
+    <a href="#side-effects">Package Side Effects</a>
+    <a href="#summary">Summary</a>
+  </div>
+
+  <div class="content">
+    <h1 id="intro">Blank Identifier in Go</h1>
+    <p>The <strong>blank identifier</strong> in Go is represented by an underscore (<code>_</code>). It acts as a <em>write-only variable</em>—you can assign values to it, but you cannot read from it. It is a useful feature when you want to ignore certain values without causing compiler errors.</p>
+
+    <div class="card" id="ignoring-returns">
+      <h2>1. Ignoring Unused Return Values</h2>
+      <p>When a function returns multiple values, you can use <code>_</code> to ignore the ones you don't need.</p>
+      <pre><code>num, _ := strconv.Atoi("123")
+fmt.Println(num) // Only the integer is used, error is ignored</code></pre>
+    </div>
+
+    <div class="card" id="loops">
+      <h2>2. Ignoring Values in Loops</h2>
+      <p>When iterating over a collection with <code>range</code>, you may not always need both the index and the value.</p>
+      <pre><code>words := []string{"go", "is", "fun"}
+for _, word := range words {
+    fmt.Println(word) // index is ignored
+}</code></pre>
+    </div>
+
+    <div class="card" id="side-effects">
+      <h2>3. Importing Packages for Side Effects</h2>
+      <p>The blank identifier can be used in <code>import</code> statements when you want to import a package only for its initialization side effects.</p>
+      <pre><code>import _ "net/http/pprof"</code></pre>
+      <p>Here, the <code>pprof</code> package is imported only to enable profiling, even though we don’t reference it directly in the code.</p>
+    </div>
+
+    <div class="card" id="summary">
+      <h2>Summary</h2>
+      <ul>
+        <li><code>_</code> is the blank identifier in Go.</li>
+        <li>It discards values you don’t want to use.</li>
+        <li>Commonly used to ignore return values, loop variables, or import side-effect packages.</li>
+      </ul>
+    </div>
+  </div>
+</body>
+</html>

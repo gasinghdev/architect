@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Go Programming - Chapter 01</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+    }
+    .sidebar {
+      width: 250px;
+      background-color: #f5f5f5;
+      padding: 20px;
+      height: 100vh;
+      position: fixed;
+      overflow-y: auto;
+      border-right: 1px solid #ddd;
+    }
+    .sidebar h2 {
+      font-size: 18px;
+      margin-bottom: 15px;
+    }
+    .sidebar a {
+      display: block;
+      padding: 8px 0;
+      text-decoration: none;
+      color: #333;
+      font-size: 14px;
+    }
+    .sidebar a:hover {
+      color: #007acc;
+    }
+    .content {
+      margin-left: 270px;
+      padding: 20px;
+      max-width: 900px;
+    }
+    h1 {
+      margin-top: 0;
+    }
+    .card {
+      background: #fff;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    pre {
+      background: #f0f0f0;
+      padding: 10px;
+      border-radius: 6px;
+      overflow-x: auto;
+    }
+    code {
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <h2>Chapter 01</h2>
+    <a href="#packages">Packages in Go</a>
+    <a href="#strings">Strings</a>
+    <a href="#runes">Runes</a>
+    <a href="#numeric">Numeric Types</a>
+    <a href="#bool">Boolean Type</a>
+    <a href="#variables">Variables</a>
+    <a href="#zero">Zero Values</a>
+    <a href="#short">Short Variable Declaration</a>
+    <a href="#exported">Exported Names</a>
+    <a href="#fmt">go fmt</a>
+    <a href="#build">go build</a>
+    <a href="#run">go run</a>
+    <a href="#multi-return">Multiple Return Values</a>
+  </div>
+
+  <div class="content">
+    <h1>Go Programming - Chapter 01</h1>
+
+    <div id="packages" class="card">
+      <h2>Packages in Go</h2>
+      <p>A <b>package</b> is a collection of related functions, types, and other code grouped together for better organization and reusability. To use a package, you must explicitly import it into your file.</p>
+      <pre><code>import "fmt"</code></pre>
+    </div>
+
+    <div id="strings" class="card">
+      <h2>Strings</h2>
+      <p>A <b>string</b> in Go is a sequence of bytes that usually represents text characters. Strings are immutable, meaning they cannot be changed after creation.</p>
+      <pre><code>message := "Hello, Go!"</code></pre>
+    </div>
+
+    <div id="runes" class="card">
+      <h2>Runes</h2>
+      <p>A <b>rune</b> represents a single Unicode code point, essentially one text character.</p>
+      <pre><code>var ch rune = 'A'</code></pre>
+    </div>
+
+    <div id="numeric" class="card">
+      <h2>Numeric Types</h2>
+      <p>Go’s two most common numeric types are:</p>
+      <ul>
+        <li><b>int</b>: Stores whole numbers.</li>
+        <li><b>float64</b>: Stores decimal numbers.</li>
+      </ul>
+    </div>
+
+    <div id="bool" class="card">
+      <h2>Boolean Type</h2>
+      <p>The <b>bool</b> type holds values <code>true</code> or <code>false</code>, commonly used in conditions.</p>
+      <pre><code>var isActive bool = true</code></pre>
+    </div>
+
+    <div id="variables" class="card">
+      <h2>Variables</h2>
+      <p>A <b>variable</b> is a named piece of storage that can hold a value of a specified type.</p>
+      <pre><code>var age int = 25</code></pre>
+    </div>
+
+    <div id="zero" class="card">
+      <h2>Zero Values</h2>
+      <p>If a variable is declared without a value, Go assigns it a <b>zero value</b> based on its type.</p>
+      <ul>
+        <li><code>int</code> → 0</li>
+        <li><code>float64</code> → 0.0</li>
+        <li><code>string</code> → ""</li>
+        <li><code>bool</code> → false</li>
+      </ul>
+    </div>
+
+    <div id="short" class="card">
+      <h2>Short Variable Declaration</h2>
+      <p>Go allows you to declare and initialize a variable in a single step using <code>:=</code>.</p>
+      <pre><code>name := "Alice"</code></pre>
+    </div>
+
+    <div id="exported" class="card">
+      <h2>Exported Names</h2>
+      <p>Identifiers starting with a <b>capital letter</b> are exported and accessible outside their package, while lowercase names are private.</p>
+      <pre><code>fmt.Println("Hello")</code></pre>
+    </div>
+
+    <div id="fmt" class="card">
+      <h2>go fmt</h2>
+      <p>The <code>go fmt</code> command reformats source code to follow Go’s standard formatting rules.</p>
+    </div>
+
+    <div id="build" class="card">
+      <h2>go build</h2>
+      <p>The <code>go build</code> command compiles Go source code into a binary executable.</p>
+      <pre><code>go build main.go</code></pre>
+    </div>
+
+    <div id="run" class="card">
+      <h2>go run</h2>
+      <p>The <code>go run</code> command compiles and runs Go programs without leaving an executable file behind.</p>
+      <pre><code>go run main.go</code></pre>
+    </div>
+
+    <div id="multi-return" class="card">
+      <h2>Multiple Return Values</h2>
+      <p>In Go, functions and methods can return <b>multiple values</b>, unlike many other languages. This feature is most often used to return both a result and an <code>error</code> value.</p>
+
+      <p><b>Example: Reading Input</b></p>
+      <pre><code>input, err := reader.ReadString('\n')
+if err != nil {
+    fmt.Println("Error:", err)
+}
+      </code></pre>
+
+      <p><b>Example: String to Integer Conversion</b></p>
+      <pre><code>num, err := strconv.Atoi("123")
+if err != nil {
+    fmt.Println("Conversion failed:", err)
+} else {
+    fmt.Println("Converted number:", num)
+}
+      </code></pre>
+
+      <p><b>Key Points:</b></p>
+      <ul>
+        <li>First return value → main result.</li>
+        <li>Second (or later) return value → often an <code>error</code>.</li>
+        <li>This makes error handling explicit and reliable.</li>
+      </ul>
+    </div>
+
+  </div>
+</body>
+</html>

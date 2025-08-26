@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Write‑Ahead Logging (WAL) — Deep Dive with Flowchart</title>
+  <meta name="description" content="A focused deep dive on Write‑Ahead Logging (WAL): how it guarantees Atomicity and Durability, crash recovery phases, checkpoints, LSNs, and group commit. Includes a themed SVG flowchart.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#0b1020;--surface:#12172a;--card:#141a31;--text:#e8ecff;--muted:#b2b9d9;--border:#243055;--accent:#7c5cff;--accent2:#2dd4bf;--radius:18px;--shadow:0 14px 40px rgba(0,0,0,.35);--max:1100px}
+    .light{--bg:#f6f7fb;--surface:#ffffff;--card:#ffffff;--text:#0b1020;--muted:#5b6280;--border:#e6e8f2;--accent:#6a5cff;--accent2:#0ea5e9;--shadow:0 12px 26px rgba(22,29,60,.08)}
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial;color:var(--text);background:
+      radial-gradient(1200px 600px at 20% -10%, rgba(124,92,255,.25), transparent 40%),
+      radial-gradient(900px 700px at 120% 10%, rgba(45,212,191,.16), transparent 45%),var(--bg)}
+    .wrap{max-width:var(--max);margin:0 auto;padding:22px}
+    .hero{display:grid;gap:16px;padding:clamp(20px,5vw,44px);background:linear-gradient(180deg,rgba(124,92,255,.12),transparent 55%),var(--surface);border:1px solid var(--border);border-radius:22px;box-shadow:var(--shadow)}
+    .badge{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);background:linear-gradient(90deg,rgba(124,92,255,.15),rgba(45,212,191,.14));border:1px dashed var(--border);border-radius:999px}
+    h1{margin:.1rem 0 .25rem;font-size:clamp(28px,4.4vw,46px);letter-spacing:-.02em;line-height:1.08}
+    .sub{margin:0;color:var(--muted);max-width:75ch;font-size:clamp(14px,2.2vw,18px)}
+    .actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px}
+    .btn{appearance:none;border:1px solid var(--border);background:var(--card);color:var(--text);padding:12px 16px;border-radius:12px;font-weight:700;display:inline-flex;align-items:center;gap:10px;text-decoration:none;cursor:pointer;transition:transform .06s ease,border-color .2s ease,background .2s ease}
+    .btn:hover{transform:translateY(-2px);border-color:var(--accent)}
+    .btn.primary{border:none;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+
+    .grid{display:grid;grid-template-columns:280px 1fr;gap:22px;margin-top:22px}
+    @media (max-width:980px){.grid{grid-template-columns:1fr}}
+
+    .toc{position:sticky;top:16px;align-self:start;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:var(--shadow)}
+    .toc h3{margin:.25rem 0 .5rem;font-size:13px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
+    .toc a{display:block;padding:10px 12px;border-radius:10px;color:var(--text);text-decoration:none;font-weight:600}
+    .toc a:hover{background:rgba(124,92,255,.12)}
+
+    section{scroll-margin-top:90px}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:clamp(18px,3.2vw,28px);box-shadow:var(--shadow);margin-bottom:20px}
+    .head{display:flex;gap:12px;align-items:center;margin-bottom:8px}
+    .chip{font-size:12px;color:var(--muted);border:1px solid var(--border);border-radius:999px;padding:6px 10px}
+
+    .list{display:grid;gap:10px;margin-top:10px}
+    .item{display:grid;grid-template-columns:26px 1fr;gap:10px;align-items:flex-start}
+    .dot{width:12px;height:12px;margin-top:7px;border-radius:3px;background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 4px 10px rgba(124,92,255,.3);transform:rotate(45deg)}
+
+    .note{background:linear-gradient(180deg,rgba(45,212,191,.12),transparent 60%),var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;color:var(--muted);font-size:14px}
+
+    .kbd{font:600 12px "Fira Code";background:var(--card);border:1px solid var(--border);padding:2px 6px;border-radius:6px}
+
+    .footer{text-align:center;color:var(--muted);padding:36px 12px;font-size:14px}
+
+    /* Flowchart helpers */
+    .flow-wrap{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:12px;overflow:auto}
+    .legend{display:flex;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:12px;margin:8px 0 0}
+    .legend span{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border:1px solid var(--border);border-radius:999px}
+    .box{fill:var(--surface);stroke:var(--border);stroke-width:1}
+    .title{font-weight:800}
+    .small{font-size:12px;fill:var(--muted)}
+  </style>
+</head>
+<body id="top">
+  <div class="wrap">
+    <header class="hero">
+      <div>
+        <span class="badge">DBMS • ACID • Logging</span>
+        <h1>Write‑Ahead Logging (WAL)</h1>
+        <p class="sub">How WAL guarantees <strong>Atomicity</strong> and <strong>Durability</strong>, with crash recovery (ARIES), checkpoints, LSNs, and performance techniques like group commit — plus a flowchart you can use in interviews.</p>
+        <div class="actions">
+          <a class="btn primary" href="#flow">See Flowchart</a>
+          <button class="btn" id="themeBtn" aria-label="Toggle theme">Toggle Theme</button>
+          <a class="btn" href="#deep">Deep Dive</a>
+        </div>
+      </div>
+    </header>
+
+    <div class="grid">
+      <nav class="toc" aria-label="Table of contents">
+        <h3>Contents</h3>
+        <a href="#basics">WAL Basics</a>
+        <a href="#flow">Flowchart</a>
+        <a href="#deep">Deep Dive</a>
+        <a href="#recovery">Crash Recovery (ARIES)</a>
+        <a href="#perf">Performance & Tuning</a>
+        <a href="#faq">FAQs & Interview Cues</a>
+        <a href="#remember">Points to Remember</a>
+        <hr style="border:none;border-top:1px solid var(--border);margin:10px 0">
+        <a href="#top">Back to top ↑</a>
+      </nav>
+
+      <main>
+        <section id="basics" class="card">
+          <div class="head"><h2>WAL Basics</h2><span class="chip">Write‑Before‑Data</span></div>
+          <div class="list">
+            <div class="item"><span class="dot"></span><div><strong>Definition:</strong> <em>All changes are first recorded in the log on durable storage before data pages are written.</em> This order is the WAL rule.</div></div>
+            <div class="item"><span class="dot"></span><div><strong>Guarantees:</strong> <u>Atomicity</u> (undo incomplete transactions) and <u>Durability</u> (redo committed transactions after a crash).</div></div>
+            <div class="item"><span class="dot"></span><div><strong>Key Terms:</strong> <em>LSN</em> (Log Sequence Number), <em>fsync</em> (flush to disk), <em>checkpoint</em> (bounded recovery), <em>group commit</em> (batching fsync).</div></div>
+          </div>
+          <div class="note">Rule of thumb: <strong>Force log, not data</strong> on commit. Data pages can be flushed lazily; the log must be durable immediately.</div>
+        </section>
+
+        <section id="flow" class="card">
+          <div class="head"><h2>Flowchart — WAL & Commit Path</h2><span class="chip">SVG Diagram</span></div>
+          <div class="flow-wrap">
+            <svg viewBox="0 0 1080 640" width="100%" height="100%" role="img" aria-label="WAL commit and recovery flowchart">
+              <defs>
+                <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                  <path d="M0,0 L10,3 L0,6 Z" fill="currentColor"></path>
+                </marker>
+                <linearGradient id="grad" x1="0" x2="1">
+                  <stop offset="0%" stop-color="var(--accent)"/>
+                  <stop offset="100%" stop-color="var(--accent2)"/>
+                </linearGradient>
+              </defs>
+
+              <!-- Swimlanes titles -->
+              <text x="120" y="30" class="title">Client</text>
+              <text x="420" y="30" class="title">DBMS (Buffer & Log Manager)</text>
+              <text x="840" y="30" class="title">Storage</text>
+
+              <!-- Swimlane separators -->
+              <line x1="360" y1="10" x2="360" y2="630" stroke="var(--border)"/>
+              <line x1="760" y1="10" x2="760" y2="630" stroke="var(--border)"/>
+
+              <!-- Nodes -->
+              <g id="n1">
+                <rect x="60" y="60" rx="12" ry="12" width="220" height="60" class="box" />
+                <text x="170" y="95" text-anchor="middle">BEGIN TRANSACTION</text>
+              </g>
+              <g id="n2">
+                <rect x="400" y="140" rx="12" ry="12" width="300" height="70" class="box" />
+                <text x="550" y="170" text-anchor="middle">Modify data pages in buffer</text>
+                <text x="550" y="188" text-anchor="middle" class="small">(create WAL records with LSNs)</text>
+              </g>
+              <g id="n3">
+                <rect x="780" y="230" rx="12" ry="12" width="240" height="70" class="box" />
+                <text x="900" y="260" text-anchor="middle">Append WAL to log</text>
+                <text x="900" y="278" text-anchor="middle" class="small">fsync → durable</text>
+              </g>
+              <g id="n4">
+                <rect x="400" y="320" rx="12" ry="12" width="300" height="70" class="box" />
+                <text x="550" y="350" text-anchor="middle">Mark Tx committed</text>
+                <text x="550" y="368" text-anchor="middle" class="small">(commit record in WAL)</text>
+              </g>
+              <g id="n5">
+                <rect x="780" y="410" rx="12" ry="12" width="240" height="70" class="box" />
+                <text x="900" y="440" text-anchor="middle">Flush dirty data pages</text>
+                <text x="900" y="458" text-anchor="middle" class="small">lazy / background</text>
+              </g>
+              <g id="n6">
+                <rect x="60" y="510" rx="12" ry="12" width="220" height="60" class="box" />
+                <text x="170" y="545" text-anchor="middle">ACK COMMIT to client</text>
+              </g>
+
+              <!-- Arrows -->
+              <g stroke="url(#grad)" stroke-width="2.2" fill="none" marker-end="url(#arrow)">
+                <path d="M280,90 C360,90 360,120 400,120" />
+                <path d="M700,175 C740,175 760,190 780,230" />
+                <path d="M1020,265 C1040,265 1040,300 960,300 C900,300 860,300 700,355" />
+                <path d="M700,355 C740,355 760,370 780,410" />
+                <path d="M700,355 C660,355 640,420 300,540" />
+              </g>
+
+              <!-- Crash branch -->
+              <g id="crash">
+                <rect x="780" y="95" rx="12" ry="12" width="240" height="60" class="box" />
+                <text x="900" y="130" text-anchor="middle">Crash after logging?</text>
+                <path d="M700,175 C760,175 760,125 780,125" stroke="url(#grad)" stroke-width="2.2" fill="none" marker-end="url(#arrow)"/>
+                <text x="900" y="80" text-anchor="middle" class="small">On restart: REDO from last checkpoint</text>
+              </g>
+
+              <g id="crash2">
+                <rect x="400" y="230" rx="12" ry="12" width="300" height="60" class="box" />
+                <text x="550" y="265" text-anchor="middle">Crash before logging?</text>
+                <path d="M550,210 C550,210 550,230 550,230" stroke="url(#grad)" stroke-width="2.2" fill="none" marker-end="url(#arrow)"/>
+                <text x="550" y="205" text-anchor="middle" class="small">On restart: UNDO uncommitted</text>
+              </g>
+
+              <!-- Checkpoint note -->
+              <g>
+                <rect x="60" y="320" rx="12" ry="12" width="220" height="70" class="box" />
+                <text x="170" y="350" text-anchor="middle">Checkpoint</text>
+                <text x="170" y="368" text-anchor="middle" class="small">limits recovery work</text>
+                <path d="M280,355 C360,355 360,355 400,355" stroke="url(#grad)" stroke-width="2.2" fill="none" marker-end="url(#arrow)"/>
+              </g>
+            </svg>
+          </div>
+          <div class="legend"><span>Commit path</span><span>Crash branches</span><span>Checkpoint</span></div>
+        </section>
+
+        <section id="deep" class="card">
+          <div class="head"><h2>Deep Dive</h2><span class="chip">LSN • Force‑Log • No‑Force Data</span></div>
+          <ul class="list" role="list">
+            <li class="item"><span class="dot"></span><div><strong>LSN (Log Sequence Number):</strong> Every log record and data page carries an LSN; a page isn’t written until its pageLSN ≤ durableLSN (the WAL “pageLSN rule”).</div></li>
+            <li class="item"><span class="dot"></span><div><strong>Force‑Log / No‑Force:</strong> On commit, the system forces (fsyncs) the log to disk but does not force data pages (they can be flushed later).</div></li>
+            <li class="item"><span class="dot"></span><div><strong>Steal / No‑Steal:</strong> Buffers may be written before commit (steal). WAL + undo records ensure uncommitted bytes can be rolled back during recovery.</div></li>
+            <li class="item"><span class="dot"></span><div><strong>Group Commit:</strong> Batches many commits into one fsync to amortize latency — critical for high throughput.</div></li>
+          </ul>
+          <div class="note">WAL enables <strong>high performance</strong> by writing sequential log records while deferring random data page writes.</div>
+        </section>
+
+        <section id="recovery" class="card">
+          <div class="head"><h2>Crash Recovery (ARIES)</h2><span class="chip">Analysis → Redo → Undo</span></div>
+          <ol class="list" role="list">
+            <li class="item"><span class="dot"></span><div><strong>Analysis:</strong> Reconstruct in‑flight transactions and dirty page table from the log since the last checkpoint.</div></li>
+            <li class="item"><span class="dot"></span><div><strong>Redo:</strong> Reapply idempotently from the redoLSN to ensure all committed effects are present (even if data pages were lost).</div></li>
+            <li class="item"><span class="dot"></span><div><strong>Undo:</strong> Roll back losers (uncommitted transactions) using compensation log records (CLRs) to ensure repeatable recovery.</div></li>
+          </ol>
+          <div class="note">Atomicity = ability to UNDO losers. Durability = ability to REDO winners.</div>
+        </section>
+
+        <section id="perf" class="card">
+          <div class="head"><h2>Performance & Tuning</h2><span class="chip">Throughput • Latency</span></div>
+          <ul class="list" role="list">
+            <li class="item"><span class="dot"></span><div><strong>Batching:</strong> Increase group commit window slightly to multiply throughput (at some added latency).</div></li>
+            <li class="item"><span class="dot"></span><div><strong>Storage:</strong> Put logs on low‑latency storage (NVMe) and separate from data for predictable fsync.</div></li>
+            <li class="item"><span class="dot"></span><div><strong>Checkpoints:</strong> Tune frequency/size to balance restart time vs steady‑state overhead.</div></li>
+            <li class="item"><span class="dot"></span><div><strong>Replication:</strong> For synchronous replicas, commit latency includes quorum acks; for async, watch potential data loss window.</div></li>
+          </ul>
+        </section>
+
+        <section id="faq" class="card">
+          <div class="head"><h2>FAQs & Interview Cues</h2><span class="chip">Be Ready</span></div>
+          <dl>
+            <dt><strong>How exactly does WAL ensure Atomicity?</strong></dt>
+            <dd>By logging undo information for each change; on crash, uncommitted changes are rolled back using these records.</dd>
+            <dt><strong>How does WAL ensure Durability?</strong></dt>
+            <dd>Commit isn’t acknowledged until the commit log record is flushed to disk; after crash, redo replays committed effects.</dd>
+            <dt><strong>What’s the role of checkpoints?</strong></dt>
+            <dd>They bound recovery by flushing a subset of dirty pages and logging a snapshot of state, so redo can start from the checkpoint’s redoLSN.</dd>
+            <dt><strong>Why separate log and data devices?</strong></dt>
+            <dd>Logs are sequential and latency‑sensitive; separating avoids random I/O interference from data page flushes.</dd>
+          </dl>
+        </section>
+
+        <section id="remember" class="card">
+          <div class="head"><h2>Points to Remember</h2><span class="chip">Cheat‑Sheet</span></div>
+          <ul class="list" role="list">
+            <li class="item"><span class="dot"></span><div>Commit = <strong>force log</strong>, not force data.</div></li>
+            <li class="item"><span class="dot"></span><div><strong>pageLSN ≤ durableLSN</strong> before a page can be flushed.</div></li>
+            <li class="item"><span class="dot"></span><div><strong>Analysis → Redo → Undo</strong> on restart.</div></li>
+            <li class="item"><span class="dot"></span><div>Group commit for throughput; checkpoints to cap recovery time.</div></li>
+            <li class="item"><span class="dot"></span><div>Separate log and data storage for predictable fsync latency.</div></li>
+          </ul>
+        </section>
+
+        <footer class="footer">Built with ♥. Toggle theme for print‑friendly light mode.</footer>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const root=document.body;const btn=document.getElementById('themeBtn');const KEY='wal-theme-light';
+    const apply=()=>{if(localStorage.getItem(KEY)==='1')root.classList.add('light');else root.classList.remove('light')};
+    apply();
+    btn.addEventListener('click',()=>{const cur=localStorage.getItem(KEY)==='1';localStorage.setItem(KEY,cur?'0':'1');apply()});
+  </script>
+</body>
+</html>

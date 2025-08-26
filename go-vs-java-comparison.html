@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Go vs Java Comparison</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #ffffff;
+      color: #333333;
+      line-height: 1.6;
+    }
+    header {
+      background: #f8f9fa;
+      color: #222;
+      padding: 20px 0;
+      text-align: center;
+      border-bottom: 1px solid #ddd;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2.5rem;
+    }
+    .container {
+      width: 90%;
+      max-width: 1200px;
+      margin: 20px auto;
+    }
+    h2 {
+      color: #111;
+      border-left: 4px solid #007bff;
+      padding-left: 10px;
+      margin-top: 30px;
+    }
+    p {
+      margin: 10px 0;
+    }
+    .card {
+      background: #fff;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+      border: 1px solid #e0e0e0;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      border: 1px solid #ddd;
+    }
+    table th, table td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: left;
+    }
+    table th {
+      background: #f1f1f1;
+    }
+    table tr:hover {
+      background: #f9f9f9;
+    }
+    .flowchart {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 40px 0;
+    }
+    .flowchart div {
+      padding: 15px 25px;
+      margin: 10px;
+      background: #fff;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .flowchart div:hover {
+      transform: scale(1.02);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+    }
+    .arrow {
+      font-size: 1.5rem;
+      color: #007bff;
+    }
+    pre {
+      background: #f5f5f5;
+      padding: 15px;
+      border-radius: 8px;
+      overflow-x: auto;
+      border: 1px solid #ddd;
+    }
+    code {
+      font-family: Consolas, monospace;
+      font-size: 0.95rem;
+      color: #d63384;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Go vs Java: In-Depth Comparison</h1>
+  </header>
+
+  <div class="container">
+    <div class="card">
+      <h2>Overview</h2>
+      <p>Go (Golang) and Java are powerful programming languages with different strengths. Java is a mature, enterprise-focused language with a massive ecosystem, while Go is designed for simplicity, concurrency, and cloud-native development.</p>
+    </div>
+
+    <div class="card">
+      <h2>History & Philosophy</h2>
+      <p><strong>Go</strong> was developed at Google in 2009 with the aim of improving developer productivity, reducing complexity, and enabling high-performance applications with built-in concurrency support. It emphasizes simplicity, speed, and ease of deployment.</p>
+      <p><strong>Java</strong>, introduced in 1995 by Sun Microsystems (now owned by Oracle), follows the philosophy of “Write Once, Run Anywhere.” It became the backbone of enterprise applications, Android apps, and large-scale systems.</p>
+    </div>
+
+    <div class="card">
+      <h2>Syntax & Learning Curve</h2>
+      <p><strong>Go</strong> is minimalistic with fewer keywords and concise syntax. It avoids features like inheritance, making it easier for beginners but sometimes restrictive for advanced programmers.</p>
+      <p><strong>Java</strong> has a verbose syntax with object-oriented principles, offering advanced features like inheritance, generics, and a huge standard library. It has a steeper learning curve but provides structure for large-scale systems.</p>
+    </div>
+
+    <div class="card">
+      <h2>Performance & Concurrency</h2>
+      <p><strong>Go</strong> offers near-C level performance, with lightweight goroutines and channels making concurrency simple and efficient.</p>
+      <p><strong>Java</strong> relies on the JVM and Just-In-Time compilation for performance. It uses threads for concurrency, which can be resource-intensive, though Project Loom is expected to improve this.</p>
+    </div>
+
+    <div class="card">
+      <h2>Ecosystem & Community</h2>
+      <p><strong>Go</strong> has a growing ecosystem, especially in cloud-native environments like Kubernetes, Docker, and microservices. It is widely adopted in DevOps, networking, and distributed systems.</p>
+      <p><strong>Java</strong> has one of the largest ecosystems in the world, with frameworks like Spring, Hibernate, and enterprise-grade solutions. It dominates in finance, enterprise backends, and Android development.</p>
+    </div>
+
+    <div class="card">
+      <h2>Use Cases</h2>
+      <ul>
+        <li><strong>Go:</strong> Cloud-native apps, APIs, microservices, DevOps tools, networking servers.</li>
+        <li><strong>Java:</strong> Enterprise applications, Android development, banking systems, large-scale platforms.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>Pros and Cons</h2>
+      <p><strong>Go Pros:</strong> Simplicity, speed, concurrency support, small binaries.</p>
+      <p><strong>Go Cons:</strong> Limited libraries, less suited for GUI apps.</p>
+      <p><strong>Java Pros:</strong> Rich ecosystem, enterprise-ready, strong tooling.</p>
+      <p><strong>Java Cons:</strong> Verbose syntax, higher memory usage, slower startup.</p>
+    </div>
+
+    <div class="card">
+      <h2>Comparison Table</h2>
+      <table>
+        <tr>
+          <th>Criteria</th>
+          <th>Go (Golang)</th>
+          <th>Java</th>
+        </tr>
+        <tr>
+          <td>Performance</td>
+          <td>Near C-level, lightweight goroutines</td>
+          <td>Optimized with JVM & JIT but higher memory use</td>
+        </tr>
+        <tr>
+          <td>Concurrency</td>
+          <td>Built-in goroutines, simple model</td>
+          <td>Thread-based, Project Loom (upcoming)</td>
+        </tr>
+        <tr>
+          <td>Ecosystem</td>
+          <td>Strong for microservices, DevOps</td>
+          <td>Massive, enterprise-grade frameworks</td>
+        </tr>
+        <tr>
+          <td>Developer Productivity</td>
+          <td>Concise syntax, faster development</td>
+          <td>Verbose, structured, better for large teams</td>
+        </tr>
+        <tr>
+          <td>Best For</td>
+          <td>Cloud-native apps, APIs, microservices</td>
+          <td>Enterprise apps, finance, Android</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>Flowchart: When to Choose Go vs Java</h2>
+      <div class="flowchart">
+        <div>Do you need high performance and concurrency?</div>
+        <div class="arrow">↓</div>
+        <div>If YES → Choose Go (Golang)</div>
+        <div>If NO → Do you need enterprise frameworks and legacy support?</div>
+        <div class="arrow">↓</div>
+        <div>If YES → Choose Java</div>
+        <div>If NO → Go can still be a simpler choice for modern apps</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Code Examples</h2>
+      <h3>Go: Hello World</h3>
+      <pre><code>package main
+import "fmt"
+
+func main() {
+    fmt.Println("Hello, World!")
+}</code></pre>
+
+      <h3>Java: Hello World</h3>
+      <pre><code>public class HelloWorld {
+    public static void main(String[] args) {
+        System.out.println("Hello, World!");
+    }
+}</code></pre>
+
+      <h3>Go: Concurrency Example</h3>
+      <pre><code>package main
+import (
+    "fmt"
+    "time"
+)
+
+func printMessage(msg string) {
+    for i := 0; i < 3; i++ {
+        fmt.Println(msg)
+        time.Sleep(time.Millisecond * 500)
+    }
+}
+
+func main() {
+    go printMessage("Hello from Goroutine")
+    printMessage("Hello from Main")
+}</code></pre>
+
+      <h3>Java: Concurrency Example</h3>
+      <pre><code>public class ConcurrencyExample {
+    public static void main(String[] args) {
+        Thread t1 = new Thread(() -> {
+            for (int i = 0; i < 3; i++) {
+                System.out.println("Hello from Thread");
+                try { Thread.sleep(500); } catch (Exception e) {}
+            }
+        });
+
+        t1.start();
+
+        for (int i = 0; i < 3; i++) {
+            System.out.println("Hello from Main");
+            try { Thread.sleep(500); } catch (Exception e) {}
+        }
+    }
+}</code></pre>
+    </div>
+
+    <div class="card">
+      <h2>Real-World Usage</h2>
+      <p><strong>Companies using Go:</strong> Google (Kubernetes, Docker), Uber, Dropbox, Cloudflare, Twitch — mainly for high-performance networking, distributed systems, and cloud-native platforms.</p>
+      <p><strong>Companies using Java:</strong> LinkedIn, Netflix, Amazon, Spotify, major banks — primarily for enterprise applications, large-scale backends, and Android apps.</p>
+    </div>
+  </div>
+</body>
+</html>
